@@ -23,6 +23,9 @@ const FlashCardsApp = StackNavigator({
     },
     Deck: {
         screen: DeckView,
+        navigationOptions: {
+            title: 'Deck'
+        },
     },
 }, {
     initialRouteName: 'Home'

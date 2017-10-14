@@ -68,8 +68,7 @@ export default class NewDeckView extends React.Component {
                            style={{marginTop: 8, height: 40, borderColor: 'gray', borderWidth: 1}}
                            onChangeText={(text) => this.setState({text})}/>
 
-                <TouchableOpacity title="Add deck"
-                                  style={{
+                <TouchableOpacity style={{
                                       marginTop: 8, marginLeft: 20, marginRight: 20,
                                       height: 48,
                                       borderColor: '#2387ca',

@@ -3,6 +3,8 @@ import { StackNavigator, TabNavigator } from 'react-navigation';
 import DecksView from "./src/DecksView";
 import NewDeckView from "./src/NewDeckView";
 import DeckView from "./src/DeckView";
+import NewCardView from "./src/NewCardView";
+import QuizView from "./src/QuizView";
 
 const MainScreen = TabNavigator({
     Decks: {
@@ -25,6 +27,18 @@ const FlashCardsApp = StackNavigator({
         screen: DeckView,
         navigationOptions: {
             title: 'Deck'
+        },
+    },
+    NewCard: {
+        screen: NewCardView,
+        navigationOptions: {
+            title: 'New Card'
+        },
+    },
+    Quiz: {
+        screen: QuizView,
+        navigationOptions: {
+            title: 'Quiz'
         },
     },
 }, {

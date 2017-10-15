@@ -4,6 +4,9 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 export default class DeckView extends React.Component {
     constructor(props) {
         super(props);
+
+        this.addCard = this.addCard.bind(this);
+        this.startQuiz = this.startQuiz.bind(this);
     }
 
     componentDidMount() {
@@ -11,11 +14,11 @@ export default class DeckView extends React.Component {
     }
 
     addCard() {
-
+        this.props.navigation.navigate('NewCard', {deck: this.props.deck})
     }
 
     startQuiz() {
-        
+        this.props.navigation.navigate('Quiz', {deck: this.props.deck})
     }
 
     render() {

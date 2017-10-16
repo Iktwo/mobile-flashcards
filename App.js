@@ -5,6 +5,7 @@ import NewDeckView from "./src/NewDeckView";
 import DeckView from "./src/DeckView";
 import NewCardView from "./src/NewCardView";
 import QuizView from "./src/QuizView";
+import * as Notifications from "./src/utils/Notifications";
 
 const MainScreen = TabNavigator({
     Decks: {
@@ -49,5 +50,9 @@ const FlashCardsApp = StackNavigator({
 export default class App extends React.Component {
     render() {
         return <FlashCardsApp/>;
+    }
+
+    componentDidMount() {
+        Notifications.setLocalNotification()
     }
 }

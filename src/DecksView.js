@@ -9,15 +9,19 @@ export default class DecksView extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {decks: {}};
+        this.state = {decks: []};
     }
 
     componentDidMount() {
         this.getDecks();
 
         DeviceEventEmitter.addListener('AddedNewDeck', () => {
-            this.getDecks()
-        })
+            this.getDecks();
+        });
+
+        DeviceEventEmitter.addListener('AddedNewCard', () => {
+            this.getDecks();
+        });
     }
 
     async getDecks() {
@@ -27,7 +31,8 @@ export default class DecksView extends React.Component {
             decks = JSON.parse(decks);
         }
 
-        this.setState({decks: decks})
+        // alert(JSON.stringify(decks))
+        this.setState({decks: decks});
     }
 
     render() {

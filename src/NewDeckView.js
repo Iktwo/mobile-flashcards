@@ -69,13 +69,13 @@ export default class NewDeckView extends React.Component {
                            onChangeText={(text) => this.setState({text})}/>
 
                 <TouchableOpacity style={{
-                                      marginTop: 8, marginLeft: 20, marginRight: 20,
-                                      height: 48,
-                                      borderColor: '#2387ca',
-                                      backgroundColor: '#3498db',
-                                      borderWidth: 1,
-                                      borderRadius: 10,
-                                  }}
+                    marginTop: 8, marginLeft: 20, marginRight: 20,
+                    height: 48,
+                    borderColor: '#2387ca',
+                    backgroundColor: '#3498db',
+                    borderWidth: 1,
+                    borderRadius: 10,
+                }}
                                   onPress={this.onPressAddDeck}
                                   color="#3498db"
                                   accessibilityLabel="Button to add a new deck">

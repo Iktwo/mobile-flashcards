@@ -9,43 +9,52 @@ import {
     TouchableOpacity,
     View
 } from 'react-native';
-import uuidv4 from 'uuid/v4';
+import NavigationActions from "react-navigation/lib-rn/NavigationActions";
 
 export default class NewCardView extends React.Component {
     static navigationOptions = {
-        tabBarLabel: 'New Deck'
+        tabBarLabel: 'New Card'
     };
 
     constructor(props) {
         super(props);
-        this.state = {text: '', modalVisible: false};
-        this.onPressAddDeck = this.onPressAddDeck.bind(this);
+        this.state = {question: '', answer: ''};
+        this.onPressAddCard = this.onPressAddCard.bind(this);
     }
 
-    async onPressAddDeck() {
+    async onPressAddCard() {
         Keyboard.dismiss();
 
-        if (this.state.text.trim() === '') {
-            alert("Text can't be empty")
+        const {deck} = this.props.navigation.state.params;
+        const {question, answer} = this.state;
+
+        if (this.state.question.trim() === '' || this.state.answer.trim() === '') {
+            alert("Please provide a question and an answer.")
         } else {
             try {
                 let decks = await AsyncStorage.getItem('Decks');
 
                 if (decks === null) {
-                    decks = [];
+                    alert('Error, no decks found.');
                 } else {
-                    decks = JSON.parse(decks);
+                    decks = JSON.parse(decks).filter((d) => d.id !== deck.id);
+
+                    if (!deck) {
+                        alert('Error, invalid deck found.');
+                    }
+
+                    let cards = deck.cards;
+                    cards.push({question, answer});
+                    deck.cards = cards;
+
+                    decks.push(deck);
+
+                    await AsyncStorage.setItem('Decks', JSON.stringify(decks));
+
+                    this.props.navigation.dispatch(NavigationActions.back());
+
+                    DeviceEventEmitter.emit('AddedNewCard');
                 }
-
-                decks.push({id: uuidv4(), name: this.state.text, cards: []});
-
-                await AsyncStorage.setItem('Decks', JSON.stringify(decks));
-
-                this.setState({text: ""});
-
-                this.props.navigation.navigate('Decks');
-
-                DeviceEventEmitter.emit('AddedNewDeck');
             } catch (error) {
                 alert(`Could not create deck ${error}`);
             }
@@ -56,32 +65,32 @@ export default class NewCardView extends React.Component {
         return (
             <View style={{flex: 1, margin: 8}}>
 
-                <View style={{flex: 1}}/>
-
-                <Text style={{fontSize: 32, marginTop: 8, textAlign: 'center'}}>What is the title of your new
+                <Text style={{fontSize: 32, marginTop: 8, textAlign: 'center'}}>What is the question of your new
                     card?</Text>
 
-                <View style={{flex: 1}}/>
-
-                <TextInput value={this.state.text}
+                <TextInput value={this.state.question}
                            onSubmitEditing={Keyboard.dismiss}
                            style={{marginTop: 8, height: 40, borderColor: 'gray', borderWidth: 1}}
-                           onChangeText={(text) => this.setState({text})}/>
+                           onChangeText={(question) => this.setState({question})}/>
 
-                <TouchableOpacity style={{
-                    marginTop: 8, marginLeft: 20, marginRight: 20,
-                    height: 48,
-                    borderColor: '#2387ca',
-                    backgroundColor: '#3498db',
-                    borderWidth: 1,
-                    borderRadius: 10,
-                }}
-                                  onPress={this.onPressAddDeck}
+
+                <Text style={{fontSize: 32, marginTop: 8, textAlign: 'center'}}>What is the answer of your new
+                    card?</Text>
+
+                <TextInput value={this.state.answer}
+                           onSubmitEditing={Keyboard.dismiss}
+                           style={{marginTop: 8, height: 40, borderColor: 'gray', borderWidth: 1}}
+                           onChangeText={(answer) => this.setState({answer})}/>
+
+                <TouchableOpacity style={styles.button}
+                                  onPress={this.onPressAddCard}
                                   color="#3498db"
                                   accessibilityLabel="Button to add a new card">
+
                     <Text style={{flex: 1, fontSize: 22, marginTop: 8, textAlign: 'center'}}>
                         Add card
                     </Text>
+
                 </TouchableOpacity>
 
                 <View style={{flex: 2}}/>
@@ -91,10 +100,12 @@ export default class NewCardView extends React.Component {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#fff',
-        alignItems: 'center',
-        justifyContent: 'center',
+    button: {
+        marginTop: 8, marginLeft: 20, marginRight: 20,
+        height: 48,
+        borderColor: '#2387ca',
+        backgroundColor: '#3498db',
+        borderWidth: 1,
+        borderRadius: 10,
     },
 });

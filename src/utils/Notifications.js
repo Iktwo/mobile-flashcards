@@ -3,6 +3,19 @@ import { AsyncStorage } from 'react-native';
 
 const NOTIFICATION_KEY = 'MobileFlashcards:notifications';
 
+export async function isNotificationScheduled() {
+    let result = false;
+
+    await AsyncStorage.getItem(NOTIFICATION_KEY).then(JSON.parse)
+        .then((data) => {
+            if (data) {
+                result = true;
+            }
+        });
+
+    return result;
+}
+
 export function clearLocalNotification() {
     return AsyncStorage.removeItem(NOTIFICATION_KEY).then(Notifications.cancelAllScheduledNotificationsAsync());
 }
@@ -23,7 +36,7 @@ function createNotification(title, body) {
     }
 }
 
-export function setLocalNotification() {
+export function setLocalNotification(date) {
     AsyncStorage.getItem(NOTIFICATION_KEY)
         .then(JSON.parse)
         .then((data) => {
@@ -32,10 +45,6 @@ export function setLocalNotification() {
                     .then(({status}) => {
                         if (status === 'granted') {
                             Notifications.cancelAllScheduledNotificationsAsync();
-
-                            let date = new Date();
-                            date.setHours(20);
-                            date.setMinutes(0);
 
                             Notifications.scheduleLocalNotificationAsync(createNotification('Take a quiz', 'Remember to study'), {
                                 time: date

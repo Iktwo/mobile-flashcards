@@ -53,6 +53,11 @@ export default class App extends React.Component {
     }
 
     componentDidMount() {
-        Notifications.setLocalNotification()
+        let date = new Date();
+        date.setHours(20);
+        date.setMinutes(0);
+
+        // Schedule notification
+        Notifications.setLocalNotification(date)
     }
 }

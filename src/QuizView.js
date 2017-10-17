@@ -1,15 +1,7 @@
 import React from 'react';
-import {
-    AsyncStorage,
-    DeviceEventEmitter,
-    Keyboard,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
-} from 'react-native';
-import uuidv4 from 'uuid/v4';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { NavigationActions } from "react-navigation";
+import * as Notifications from "./utils/Notifications";
 
 export default class QuizView extends React.Component {
     static navigationOptions = {
@@ -18,57 +10,168 @@ export default class QuizView extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {text: '', modalVisible: false};
-        this.onPressAddDeck = this.onPressAddDeck.bind(this);
+        this.state = {cardIndex: 0, showQuestion: true, points: 0};
+        this.markCorrect = this.markCorrect.bind(this);
+        this.markIncorrect = this.markIncorrect.bind(this);
     }
 
-    async onPressAddDeck() {
-        Keyboard.dismiss();
+    markCorrect() {
+        this.setState(previousState => {
+            return {cardIndex: previousState.cardIndex + 1, showQuestion: true, points: previousState.points + 1}
+        })
+    }
 
-        if (this.state.text.trim() === '') {
-            alert("Text can't be empty")
-        } else {
-            try {
-                let decks = await AsyncStorage.getItem('Decks');
+    markIncorrect() {
+        this.setState(previousState => {
+            return {cardIndex: previousState.cardIndex + 1, showQuestion: true}
+        })
+    }
 
-                if (decks === null) {
-                    decks = [];
-                } else {
-                    decks = JSON.parse(decks);
-                }
-
-                decks.push({id: uuidv4(), name: this.state.text, cards: []});
-
-                await AsyncStorage.setItem('Decks', JSON.stringify(decks));
-
-                this.setState({text: ""});
-
-                this.props.navigation.navigate('Decks');
-
-                DeviceEventEmitter.emit('AddedNewDeck');
-            } catch (error) {
-                alert(`Could not create deck ${error}`);
-            }
-        }
+    restartQuiz() {
+        this.setState({cardIndex: 0, showQuestion: true, points: 0})
     }
 
     render() {
+        const {deck} = this.props.navigation.state.params;
+
+        let questions;
+
+        if (this.state.cardIndex < deck.cards.length) {
+            questions = (
+                <View style={{flex: 1}}>
+                    <Text style={styles.text}>
+                        {`${(this.state.cardIndex + 1)}/${deck.cards.length}`}
+                    </Text>
+
+                    <Text style={{fontSize: 32, marginTop: 8, textAlign: 'center'}}>
+                        {this.state.showQuestion ? deck.cards[this.state.cardIndex].question : deck.cards[this.state.cardIndex].answer}
+                    </Text>
+
+                    <TouchableOpacity style={{margin: 8, height: 40}}
+                                      onPress={
+                                          () => this.setState(previousState => {
+                                              return {showQuestion: !previousState.showQuestion}
+                                          })
+                                      }>
+                        <Text style={styles.textLink}>
+                            {this.state.showQuestion ? 'Answer' : 'Question'}
+                        </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={styles.buttonCorrect}
+                                      onPress={this.markCorrect}
+                                      accessibilityLabel="Mark question as correct">
+                        <Text style={styles.buttonText}>
+                            Correct
+                        </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity style={styles.buttonIncorrect}
+                                      onPress={this.markIncorrect}
+                                      accessibilityLabel="Mark question as incorrect">
+                        <Text style={styles.buttonText}>
+                            Incorrect
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+            );
+        } else {
+            Notifications.clearLocalNotification();
+
+            let date = new Date();
+            date.setDate(date.getDate() + 1);
+            date.setHours(20);
+            date.setMinutes(0);
+
+            // Schedule notification for tomorrow
+            Notifications.setLocalNotification(date)
+        }
+
+        const results = (
+            <View style={{flex: 1}}>
+                <Text style={styles.textResults}>
+                    {`Score: ${(this.state.points)}/${deck.cards.length}`}
+                </Text>
+
+                <TouchableOpacity style={styles.button}
+                                  onPress={this.restartQuiz}
+                                  accessibilityLabel="Restart Quiz">
+                    <Text style={styles.buttonText}>
+                        Restart Quiz
+                    </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.button}
+                                  onPress={() => this.props.navigation.dispatch(NavigationActions.back())}
+                                  accessibilityLabel="Back to Deck">
+                    <Text style={styles.buttonText}>
+                        Back to Deck
+                    </Text>
+                </TouchableOpacity>
+            </View>
+        );
+
+        // alert(JSON.stringify(deck));
+
         return (
             <View style={{flex: 1, margin: 8}}>
-
-                <View style={{flex: 1}}/>
-
-                <Text style={{fontSize: 32, marginTop: 8, textAlign: 'center'}}>Quiz view?</Text>
+                {this.state.cardIndex < deck.cards.length ? questions : results}
             </View>
         );
     }
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#fff',
-        alignItems: 'center',
-        justifyContent: 'center',
+    text: {
+        fontSize: 16,
+        textAlign: 'left'
     },
+    textLink: {
+        flex: 1,
+        fontSize: 20,
+        textAlign: 'center',
+        color: '#3498db'
+    },
+    textResults: {
+        fontSize: 32,
+        textAlign: 'center',
+        color: '#3498db'
+    },
+    button: {
+        marginTop: 8,
+        marginLeft: 20,
+        marginRight: 20,
+        height: 48,
+        borderColor: '#2387ca',
+        backgroundColor: '#3498db',
+        borderWidth: 1,
+        borderRadius: 10
+    },
+    buttonCorrect: {
+        marginTop: 8,
+        marginLeft: 20,
+        marginRight: 20,
+        height: 48,
+        borderColor: '#27ae60',
+        backgroundColor: '#2ecc71',
+        borderWidth: 1,
+        borderRadius: 10
+    },
+    buttonIncorrect: {
+        marginTop: 8,
+        marginLeft: 20,
+        marginRight: 20,
+        height: 48,
+        borderColor: '#c0392b',
+        backgroundColor: '#e74c3c',
+        borderWidth: 1,
+        borderRadius: 10
+    },
+    buttonText: {
+        flex: 1,
+        fontSize: 22,
+        marginTop: 8,
+        textAlign: 'center',
+        color: '#ededed'
+    }
 });

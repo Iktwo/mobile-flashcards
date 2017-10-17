@@ -18,7 +18,7 @@ export default class NewDeckView extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {text: '', modalVisible: false};
+        this.state = {text: ''};
         this.onPressAddDeck = this.onPressAddDeck.bind(this);
     }
 

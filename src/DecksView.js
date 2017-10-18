@@ -1,5 +1,5 @@
 import React from 'react';
-import { AsyncStorage, DeviceEventEmitter, FlatList, StyleSheet, Text, View } from 'react-native';
+import { AsyncStorage, DeviceEventEmitter, FlatList, Text, View } from 'react-native';
 import DeckDelegate from "./components/DeckDelegate";
 
 export default class DecksView extends React.Component {
@@ -31,7 +31,6 @@ export default class DecksView extends React.Component {
             decks = JSON.parse(decks);
         }
 
-        // alert(JSON.stringify(decks))
         this.setState({decks: decks});
     }
 
@@ -62,12 +61,3 @@ export default class DecksView extends React.Component {
         }
     }
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#fff',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-});

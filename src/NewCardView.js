@@ -65,7 +65,7 @@ export default class NewCardView extends React.Component {
         return (
             <View style={{flex: 1, margin: 8}}>
 
-                <Text style={{fontSize: 32, marginTop: 8, textAlign: 'center'}}>What is the question of your new
+                <Text style={styles.text}>What is the question of your new
                     card?</Text>
 
                 <TextInput value={this.state.question}
@@ -74,7 +74,7 @@ export default class NewCardView extends React.Component {
                            onChangeText={(question) => this.setState({question})}/>
 
 
-                <Text style={{fontSize: 32, marginTop: 8, textAlign: 'center'}}>What is the answer of your new
+                <Text style={styles.text}>What is the answer of your new
                     card?</Text>
 
                 <TextInput value={this.state.answer}
@@ -101,11 +101,18 @@ export default class NewCardView extends React.Component {
 
 const styles = StyleSheet.create({
     button: {
-        marginTop: 8, marginLeft: 20, marginRight: 20,
+        marginTop: 8,
+        marginLeft: 20,
+        marginRight: 20,
         height: 48,
         borderColor: '#2387ca',
         backgroundColor: '#3498db',
         borderWidth: 1,
         borderRadius: 10,
     },
+    text: {
+        fontSize: 32,
+        marginTop: 8,
+        textAlign: 'center'
+    }
 });
